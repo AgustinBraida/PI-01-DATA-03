@@ -10,18 +10,11 @@ user = APIRouter()
 Session = sessionmaker(bind=engine)
 Session.configure(bind=engine)
 session = Session()
+
 @user.get("/")
 def root():
     # return conn.execute(races.select().where(races.c.year == 2019)).fetchall()
     # return conn.execute(Session(func.count(races.year), races.year).group_by(races.year)).all()
-    return session.query(races, func.count(races.c.year)).group_by(races.c.year).order_by(desc(races.c.year)).first()
-
-
-    # with engine.connect() as conn:
-    #     result = conn.execute(races.select()).fetchall()
-
-    #     return result
-
-# SELECT COUNT(Anio) AS Cantidad, Anio
-# FROM races
-# GROUP BY Anio ORDER BY Cantidad DESC;
+    circuito = session.query(races, func.count(races.c.name)).group_by(races.c.name).order_by(desc(races.c.name)).first()
+    year = session.query(races, func.count(races.c.year)).group_by(races.c.year).order_by(desc(races.c.year)).first()
+    return f"""El Año con más carrera fue el: {year['year']}   ||  El circuito más corrido: {circuito['name']}"""
